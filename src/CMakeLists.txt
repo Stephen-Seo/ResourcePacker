@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 project(ResourcePacker)
 
-file(GLOB_RECURSE ResourcePacker_SOURCES "*.cpp")
-add_executable(ResourcePacker ${ResourcePacker_SOURCES})
-
 if(NOT MSVC)
     set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra")
     set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
@@ -28,5 +25,20 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 endif()
 
-install(TARGETS ResourcePacker DESTINATION bin)
+if(NOT DEFINED BUILD_SHARED_LIBS)
+    message(STATUS "Setting BUILD_SHARED_LIBS to 'True', none was specified.")
+    set(BUILD_SHARED_LIBS True CACHE STRING "Choose whether or not to build lib as shared." FORCE)
+    set_property(CACHE BUILD_SHARED_LIBS PROPERTY STRINGS "True" "False")
+endif()
+
+add_library(ResourcePacker ResourcePacker.cpp)
+
+add_executable(ResourcePackerExecutable main.cpp)
+
+target_link_libraries(ResourcePackerExecutable ResourcePacker)
+
+
+install(TARGETS ResourcePacker DESTINATION lib)
+install(TARGETS ResourcePackerExecutable DESTINATION bin)
+install(FILES ResourcePacker.hpp DESTINATION usr/include)
 
