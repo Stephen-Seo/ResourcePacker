@@ -61,6 +61,88 @@ bool RP::checkIfValidFilename(std::string name)
     return name.find_first_not_of(VALID_FILENAME_CHARS) == std::string::npos;
 }
 
+bool RP::checkIfPackfile(const char* name)
+{
+    std::ifstream ifstream;
+    ifstream.imbue(std::locale::classic());
+    ifstream.open(name);
+
+    if(!ifstream.good())
+    {
+        if(ifstream.is_open())
+            ifstream.close();
+        return false;
+    }
+
+    char* data = (char*) malloc(sizeof(char) * 127);
+    unsigned short number;
+
+    // check identifier
+    ifstream.read(data, 5);
+    data[5] = '\0';
+
+    if(std::strcmp(data, RESOURCE_PACKER_IDENTIFIER) != 0 || !ifstream.good())
+    {
+        ifstream.close();
+        free(data);
+        return false;
+    }
+
+    // check if filesize is greater than header
+
+    // get number of items
+    ifstream.read((char*) &number, 2);
+
+    if(!ifstream.good())
+    {
+        if(ifstream.is_open())
+            ifstream.close();
+        free(data);
+        return false;
+    }
+
+    unsigned long long lastLocation;
+    // seek through rest of header
+    for(unsigned short i = 0; i < number; ++i)
+    {
+        // location
+        ifstream.read((char*) &lastLocation, 8);
+
+        if(!ifstream.good())
+        {
+            if(ifstream.is_open())
+                ifstream.close();
+            free(data);
+            return false;
+        }
+
+        // name
+        ifstream.read(data, 127);
+
+        if(!ifstream.good())
+        {
+            if(ifstream.is_open())
+                ifstream.close();
+            free(data);
+            return false;
+        }
+    }
+
+    // check if filesize is greater than last location
+    ifstream.seekg(lastLocation);
+    if(!ifstream.good())
+    {
+        if(ifstream.is_open())
+            ifstream.close();
+        free(data);
+        return false;
+    }
+
+    ifstream.close();
+    free(data);
+    return true;
+}
+
 bool RP::createPackfile(std::list<std::string> files, std::string packfileName)
 {
     // fail if file exists with same filename
@@ -84,6 +166,7 @@ bool RP::createPackfile(std::list<std::string> files, std::string packfileName)
         info.names.push_back(getNameFromPath(*iter));
 
         std::ifstream ifstream;
+        ifstream.imbue(std::locale::classic());
         ifstream.open(*iter);
 
         while(!ifstream.eof())
@@ -122,7 +205,12 @@ bool RP::createPackfile(std::list<std::string> files, std::string packfileName)
     
 
     std::ofstream ofstream;
+    ofstream.imbue(std::locale::classic());
     ofstream.open(packfileName, std::ios_base::out | std::ios_base::binary);
+
+    // write identifier
+    std::strncpy(data, RESOURCE_PACKER_IDENTIFIER, 5);
+    ofstream.write(data, 5);
 
     // write number of items
     ofstream.write((char*) &info.items, 2);
@@ -151,6 +239,7 @@ bool RP::createPackfile(std::list<std::string> files, std::string packfileName)
     for(auto iter = files.begin(); iter != files.end(); ++iter)
     {
         std::ifstream ifstream;
+        ifstream.imbue(std::locale::classic());
         ifstream.open(*iter, std::ios_base::in | std::ios_base::binary);
 
         while(ifstream.good())
@@ -172,12 +261,19 @@ bool RP::createPackfile(std::list<std::string> files, std::string packfileName)
 
 bool RP::readPackfileInfo(std::string packfileName, PackInfo& packInfo)
 {
-    if(!checkIfFile(packfileName.c_str()))
+    if(!checkIfFile(packfileName.c_str()) || !checkIfPackfile(packfileName.c_str()))
         return false;
 
     std::ifstream ifstream;
+    ifstream.imbue(std::locale::classic());
     ifstream.open(packfileName);
 
+    // skip identifier
+    char* tempData = (char*) malloc(sizeof(char) * 5);
+    ifstream.read(tempData, 5);
+    free(tempData);
+
+    // get number of items
     ifstream.read((char*) &packInfo.items, 2);
 
     packInfo.locations.assign(packInfo.items, 0);

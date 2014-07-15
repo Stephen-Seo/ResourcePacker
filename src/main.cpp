@@ -41,14 +41,14 @@ int main(int argc, char** argv)
     // Get inputs
     while(argc > 0)
     {
-        if(strcmp(argv[0],"-w") == 0)
+        if(std::strcmp(argv[0],"-w") == 0)
         {
             type = WRITE;
             --argc;
             ++argv;
             continue;
         }
-        else if(strcmp(argv[0],"-h") == 0)
+        else if(std::strcmp(argv[0],"-h") == 0)
         {
             printHelp();
             return 0;
@@ -74,7 +74,11 @@ int main(int argc, char** argv)
     {
     // Read table of contents of pack file
         RP::PackInfo packInfo;
-        RP::readPackfileInfo(inputList.front(), packInfo);
+        if(!RP::readPackfileInfo(inputList.front(), packInfo))
+        {
+            std::cout << "Failed to read packfile. Packfile is corrupted or not a packfile.\n";
+            return -1;
+        }
 
         std::cout << "\n";
         std::cout << packInfo.items << " items found in pack. They are as follows:\n";
@@ -95,6 +99,7 @@ int main(int argc, char** argv)
 #ifndef NDEBUG
             std::cout << "Input filename \"" << outfile << "\" is valid.\n";
 #endif
+            std::cout << "Creating packfile with name " << outfile << '\n';
             if(RP::createPackfile(inputList, outfile))
                 return 0;
             else
@@ -102,9 +107,7 @@ int main(int argc, char** argv)
         }
         else
         {
-#ifndef NDEBUG
             std::cout << "Input filename \"" << outfile << "\" is invalid.\n";
-#endif
             return -1;
         }
     }
