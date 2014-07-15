@@ -170,7 +170,7 @@ bool RP::createPackfile(std::list<std::string> files, std::string packfileName)
     return true;
 }
 
-bool RP::readPackfile(std::string packfileName, PackInfo& packInfo)
+bool RP::readPackfileInfo(std::string packfileName, PackInfo& packInfo)
 {
     if(!checkIfFile(packfileName.c_str()))
         return false;

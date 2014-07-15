@@ -35,7 +35,7 @@ namespace RP
     bool checkIfFileExists(const char* name);
     bool checkIfValidFilename(std::string name);
     bool createPackfile(std::list<std::string> files, std::string packfileName);
-    bool readPackfile(std::string packfileName, PackInfo& packInfo);
+    bool readPackfileInfo(std::string packfileName, PackInfo& packInfo);
     std::string getNameFromPath(std::string path);
 }
 

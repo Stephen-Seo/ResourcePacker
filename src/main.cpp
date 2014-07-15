@@ -74,7 +74,7 @@ int main(int argc, char** argv)
     {
     // Read table of contents of pack file
         RP::PackInfo packInfo;
-        RP::readPackfile(inputList.front(), packInfo);
+        RP::readPackfileInfo(inputList.front(), packInfo);
 
         std::cout << "\n";
         std::cout << packInfo.items << " items found in pack. They are as follows:\n";
