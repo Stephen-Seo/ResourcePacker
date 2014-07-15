@@ -185,7 +185,7 @@ bool RP::createPackfile(std::list<std::string> files, std::string packfileName)
     }
 
     // calculate header size
-    unsigned int header_size = 2 + info.items * 8 + info.items * 127;
+    unsigned int header_size = 5 + 2 + info.items * 8 + info.items * 127;
 #ifndef NDEBUG
     std::cout << "HEADER_SIZE = " << header_size << '\n';
 #endif
