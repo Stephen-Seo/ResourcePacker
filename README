@@ -32,6 +32,7 @@ Format:
     (of variable size based on files packed in the packfile)
 
 (for example, a packfile of 3 items will have a header such as:
+5 bytes equal to the packfile's identifier
 2 bytes equal to the number 3
 8 bytes equal to location of the first file in this packfile
 127 bytes containing a null-terminated string which is the name of the first
