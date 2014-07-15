@@ -15,10 +15,10 @@ enum Type
 
 void printHelp()
 {
-    std::cout << "    Usage:\n";
+    std::cout << "  Usage:\n";
     std::cout << "Specify the name of the packfile to get info about the file.\n";
     std::cout << "Option '-w' will allow you to create a packfile instead.\n";
-    std::cout << "\tPlease specify filenames to place in the packfile when writing.\n";
+    std::cout << "    You will be prompted to set the packfile name.\n";
     std::cout << "Option '-h' will print this notice.\n";
 }
 
@@ -29,6 +29,12 @@ int main(int argc, char** argv)
     // Skip program name invocation string
     --argc;
     ++argv;
+
+    if(argc == 0)
+    {
+        printHelp();
+        return 0;
+    }
 
     std::list<std::string> inputList;
 
@@ -45,6 +51,7 @@ int main(int argc, char** argv)
         else if(strcmp(argv[0],"-h") == 0)
         {
             printHelp();
+            return 0;
         }
 
 #ifndef NDEBUG
