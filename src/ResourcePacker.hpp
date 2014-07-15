@@ -3,6 +3,7 @@
 #define RESOURCE_PACKER_HPP
 
 #define VALID_FILENAME_CHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_0123456789"
+#define RW_BYTE_RATE 512
 
 #if defined(_WIN32)
 #include <Windows.h>
@@ -17,13 +18,17 @@
 #include <list>
 #include <fstream>
 
+#ifndef NDEBUG
+#include <iostream>
+#endif
+
 namespace RP
 {
     struct PackInfo
     {
-        unsigned int items;
+        unsigned short items;
         std::vector<std::string> names;
-        std::vector<unsigned int> locations;
+        std::vector<unsigned long long> locations;
     };
 
     bool checkIfFile(const char* name);

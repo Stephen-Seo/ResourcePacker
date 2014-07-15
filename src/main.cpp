@@ -67,6 +67,14 @@ int main(int argc, char** argv)
     {
     // Read table of contents of pack file
         RP::PackInfo packInfo;
+        RP::readPackfile(inputList.front(), packInfo);
+
+        std::cout << "\n";
+        std::cout << packInfo.items << " items found in pack. They are as follows:\n";
+        for(auto iter = packInfo.names.begin(); iter != packInfo.names.end(); ++iter)
+        {
+            std::cout << "  " << *iter << '\n';
+        }
     }
     else if(inputList.size() >= 1 && type == WRITE)
     {

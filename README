@@ -1,1 +1,10 @@
 ResourcePacker - a file packer and pack reader for game resources
+
+
+Format:
+  Header
+    Number of items      (16 bit / 2 bytes)
+    location (per item)  (64 bit / 8 bytes)
+    name (per item)      (127 bytes)
+  Content
+    (of variable size based on files packed in the packfile)
