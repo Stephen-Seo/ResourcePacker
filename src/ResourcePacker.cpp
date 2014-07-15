@@ -305,6 +305,83 @@ bool RP::readPackfileInfo(std::string packfileName, PackInfo& packInfo)
     return true;
 }
 
+bool RP::getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size, std::string packfile, std::string filename)
+{
+    if(!checkIfPackfile(packfile.c_str()))
+        return false;
+
+    std::ifstream ifstream;
+    ifstream.imbue(std::locale::classic());
+    ifstream.open(packfile);
+
+    char* data = (char*) malloc(sizeof(char) * 127);
+
+    ifstream.read(data, 5);
+
+    unsigned short items;
+    unsigned long long location;
+    unsigned long long nextLocation;
+    bool found = false;
+    bool nextExists = false;
+
+    ifstream.read((char*) &items, 2);
+
+    // get file location from header
+    for(unsigned short i = 0; i < items; ++i)
+    {
+        ifstream.read((char*) &location, 8);
+
+        ifstream.read(data, 127);
+
+        if(std::strcmp(data, filename.c_str()) == 0)
+        {
+            found = true;
+            if(i + 1 < items)
+            {
+                ifstream.read((char*) &nextLocation, 8);
+                nextExists = true;
+            }
+            break;
+        }
+    }
+
+    if(!found || !ifstream.good())
+    {
+        ifstream.close();
+        free(data);
+        return false;
+    }
+
+    // get file size
+    size = 0;
+
+    if(nextExists)
+    {
+        size = nextLocation - location;
+    }
+    else
+    {
+        ifstream.seekg(location);
+        while(ifstream.good())
+        {
+            ifstream.read(data, 127);
+            size += ifstream.gcount();
+        }
+    }
+
+    // get file data
+    std::unique_ptr<char[]> fileData(new char[size]);
+    ifstream.seekg(location);
+    ifstream.read(fileData.get(), size);
+
+    dataPtr = std::move(fileData);
+
+    ifstream.close();
+
+    free(data);
+    return true;
+}
+
 std::string RP::getNameFromPath(std::string path)
 {
     std::string delimeter;

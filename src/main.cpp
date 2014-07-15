@@ -20,6 +20,8 @@ void printHelp()
     std::cout << "Option '-w' will allow you to create a packfile instead.\n";
     std::cout << "    You will be prompted to set the packfile name.\n";
     std::cout << "Option '-h' will print this notice.\n";
+    std::cout << "Option '--testGet' will retrieve a file from the packfile but do nothing with it.\n";
+    std::cout << "    example: '--testGet packfileName filename'\n";
 }
 
 int main(int argc, char** argv)
@@ -51,6 +53,29 @@ int main(int argc, char** argv)
         else if(std::strcmp(argv[0],"-h") == 0)
         {
             printHelp();
+            return 0;
+        }
+        else if(std::strcmp(argv[0],"--testGet") == 0)
+        {
+            --argc;
+            ++argv;
+            if(argc != 2)
+            {
+                std::cout << "Invalid number of arguments for option '--testGet'.\n";
+                return -1;
+            }
+
+            std::string packfileName(argv[0]), filename(argv[1]);
+            std::unique_ptr<char[]> data;
+            unsigned long long size;
+
+            if(!RP::getFileData(data, size, packfileName, filename))
+            {
+                std::cout << "Failed to retrieve file from packfile.\n";
+                return -1;
+            }
+
+            std::cout << "Retrieved " << filename << " of size " << size << '\n';
             return 0;
         }
 
