@@ -52,6 +52,7 @@ add_executable(ResourcePackerExecutable main.cpp)
 target_link_libraries(ResourcePackerExecutable ResourcePacker)
 
 install(TARGETS ResourcePacker EXPORT ResourcePackerTargets
+  ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include)

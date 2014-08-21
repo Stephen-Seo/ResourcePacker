@@ -7,11 +7,29 @@
 #define RW_BYTE_RATE 512
 
 #if defined(_WIN32)
-#include <Windows.h>
+  #include <Windows.h>
+  #if defined(BUILD_SHARED_LIBS)
+    #if defined(ResourcePacker_EXPORTS)
+      #define RP_EXPORT __declspec(dllexport)
+    #else
+      #define RP_EXPORT __declspec(dllimport)
+    #endif
+  #endif
 #elif defined(__WIN32__)
-#include <Windows.h>
+  #include <Windows.h>
+  #if defined(BUILD_SHARED_LIBS)
+    #if defined(ResourcePacker_EXPORTS)
+      #define RP_EXPORT __declspec(dllexport)
+    #else
+      #define RP_EXPORT __declspec(dllimport)
+    #endif
+  #endif
 #else
-#include <sys/stat.h>
+  #include <sys/stat.h>
+#endif
+
+#ifndef RP_EXPORT
+  #define RP_EXPORT
 #endif
 
 #include <cstring>
@@ -28,7 +46,7 @@
 
 namespace RP
 {
-    struct PackInfo
+    struct RP_EXPORT PackInfo
     {
         unsigned short items;
         std::vector<std::string> names;
@@ -36,21 +54,21 @@ namespace RP
     };
 
     // checks if 'name' is an existing file and not a directory
-    bool checkIfFile(const char* name);
+    bool RP_EXPORT checkIfFile(const char* name);
     // checks if 'name' exists
-    bool checkIfFileExists(const char* name);
+    bool RP_EXPORT checkIfFileExists(const char* name);
     // checks if 'name' does not contain a valid character defined by VALID_FILENAME_CHARS
-    bool checkIfValidFilename(std::string name);
+    bool RP_EXPORT checkIfValidFilename(std::string name);
     // checks if 'name' is a packfile (checks header, not contents)
-    bool checkIfPackfile(const char* name);
+    bool RP_EXPORT checkIfPackfile(const char* name);
     // creates a packfile with filenames in list 'files' and with name 'packfileName'
-    bool createPackfile(std::list<std::string> files, std::string packfileName);
+    bool RP_EXPORT createPackfile(std::list<std::string> files, std::string packfileName);
     // gets info from the header of a packfile named 'packfileName'
-    bool readPackfileInfo(std::string packfileName, PackInfo& packInfo);
+    bool RP_EXPORT readPackfileInfo(std::string packfileName, PackInfo& packInfo);
     // gets a file's data from a packfile named 'packfile' of name 'filename'
-    bool getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size, std::string packfile, std::string filename);
+    bool RP_EXPORT getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size, std::string packfile, std::string filename);
     // returns the filename of a file defined by path 'path'
-    std::string getNameFromPath(std::string path);
+    std::string RP_EXPORT getNameFromPath(std::string path);
 }
 
 #endif
