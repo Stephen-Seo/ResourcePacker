@@ -78,7 +78,6 @@ write_basic_package_version_file(
 
 export(EXPORT ResourcePackerTargets
   FILE "${CMAKE_CURRENT_BINARY_DIR}/ResourcePacker/ResourcePackerTargets.cmake"
-  NAMESPACE RP_CMAKE::
 )
 
 configure_file(cmake/ResourcePackerConfig.cmake
@@ -90,8 +89,6 @@ set(ConfigPackageLocation lib/cmake/ResourcePacker)
 install(EXPORT ResourcePackerTargets
   FILE
     ResourcePackerTargets.cmake
-  NAMESPACE
-    RP_CMAKE::
   DESTINATION
     ${ConfigPackageLocation}
 )
