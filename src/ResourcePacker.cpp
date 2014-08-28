@@ -65,7 +65,7 @@ bool RP::checkIfPackfile(const char* name)
 {
     std::ifstream ifstream;
     ifstream.imbue(std::locale::classic());
-    ifstream.open(name);
+    ifstream.open(name, std::ios::in | std::ios::binary);
 
     if(!ifstream.good())
     {
@@ -167,12 +167,15 @@ bool RP::createPackfile(std::list<std::string> files, std::string packfileName)
 
         std::ifstream ifstream;
         ifstream.imbue(std::locale::classic());
-        ifstream.open(*iter);
+        ifstream.open(*iter, std::ios::in | std::ios::binary);
 
         while(!ifstream.eof())
         {
             ifstream.read(data, RW_BYTE_RATE);
             size += ifstream.gcount();
+#ifndef NDEBUG
+            std::cout << *iter << " partialSize: " << size << '\n';
+#endif
         }
 
 #ifndef NDEBUG
@@ -266,7 +269,7 @@ bool RP::readPackfileInfo(std::string packfileName, PackInfo& packInfo)
 
     std::ifstream ifstream;
     ifstream.imbue(std::locale::classic());
-    ifstream.open(packfileName);
+    ifstream.open(packfileName, std::ios::in | std::ios::binary);
 
     // skip identifier
     char* tempData = (char*) malloc(sizeof(char) * 5);
@@ -312,7 +315,7 @@ bool RP::getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size,
 
     std::ifstream ifstream;
     ifstream.imbue(std::locale::classic());
-    ifstream.open(packfile);
+    ifstream.open(packfile, std::ios::in | std::ios::binary);
 
     char* data = (char*) malloc(sizeof(char) * 127);
 
@@ -368,6 +371,10 @@ bool RP::getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size,
             size += ifstream.gcount();
         }
     }
+    
+#ifndef NDEBUG
+    std::cout << "size of file: " << size << '\n' << std::flush;
+#endif
 
     // get file data
     std::unique_ptr<char[]> fileData(new char[size]);
