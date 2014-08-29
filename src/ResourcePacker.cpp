@@ -376,6 +376,8 @@ bool RP::getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size,
     std::cout << "size of file: " << size << '\n' << std::flush;
 #endif
 
+    ifstream.clear();
+
     // get file data
     std::unique_ptr<char[]> fileData(new char[size]);
     ifstream.seekg(location);
