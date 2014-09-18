@@ -7,7 +7,7 @@
 #define RW_BYTE_RATE 512
 
 #if defined(_WIN32)
-  #include <Windows.h>
+  #include <windows.h>
   #if defined(BUILD_SHARED_LIBS)
     #if defined(ResourcePacker_EXPORTS)
       #define RP_EXPORT __declspec(dllexport)
@@ -16,7 +16,7 @@
     #endif
   #endif
 #elif defined(__WIN32__)
-  #include <Windows.h>
+  #include <windows.h>
   #if defined(BUILD_SHARED_LIBS)
     #if defined(ResourcePacker_EXPORTS)
       #define RP_EXPORT __declspec(dllexport)
