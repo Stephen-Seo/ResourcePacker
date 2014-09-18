@@ -44,7 +44,14 @@ model {
             eachPlatform() {
                 cppCompiler.executable "g++"
             }
-            target("linux_x86")
+            target("linux_x86") {
+                cppCompiler.withArguments { List<String> args ->
+                    args << "-m32" << "-march=i686" << "-mtune=generic"
+                }
+                linker.withArguments { List<String> args ->
+                    args << "-m32"
+                }
+            }
             target("linux_x86_64")
         }
         mingw_x86(Gcc) {
@@ -86,20 +93,15 @@ libraries {
                 cppCompiler.define "NDEBUG"
                 cppCompiler.args "-O3"
             }
-            if(targetPlatform.getDisplayName().endsWith("'linux_x86'")) {
-                cppCompiler.args "-m32", "-march=i686", "-mtune=generic"
-                linker.args "-m32"
-            }
         }
-        binaries.withType(SharedLibraryBinarySpec) {
+        binaries.withType(SharedLibraryBinarySpec) { binary ->
             cppCompiler.define "BUILD_SHARED_LIBS"
-            if(targetPlatform.getDisplayName().endsWith("'windows_x86'")) {
+            if(targetPlatform == platforms.windows_x86 || targetPlatform == platforms.windows_x86_64) {
                 cppCompiler.define "ResourcePacker_EXPORTS"
-                linker.args "-Wl,--out-implib,libResourcePacker.a"
-            }
-            if(targetPlatform.getDisplayName().endsWith("'windows_x86_64'")) {
-                cppCompiler.define "ResourcePacker_EXPORTS"
-                linker.args "-Wl,--out-implib,libResourcePacker.a"
+                def importLibPath = binary.sharedLibraryLinkFile.absolutePath.replace(".dll", ".a")
+                importLibPath = importLibPath.substring(0, importLibPath.lastIndexOf("ResourcePacker")) + "lib" + importLibPath.substring(importLibPath.lastIndexOf("ResourcePacker"))
+                //println "Generating import lib: ${importLibPath}"
+                linker.args "-Wl,--out-implib,${importLibPath}"
             }
         }
     }
@@ -118,10 +120,6 @@ executables {
             if(buildType == buildTypes.release) {
                 cppCompiler.define "NDEBUG"
                 cppCompiler.args "-O3"
-            }
-            if(targetPlatform.getDisplayName().endsWith("'linux_x86'")) {
-                cppCompiler.args "-m32", "-march=i686", "-mtune=generic"
-                linker.args "-m32"
             }
         }
     }
