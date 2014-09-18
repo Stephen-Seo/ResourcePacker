@@ -2,24 +2,9 @@ ResourcePacker - a file packer and pack reader for game resources
 
 Compiling:
 
-(using CMake)
-make a build directory in the same directory src is contained in.
-cd to that build directory
-use command:
-cmake ../src
-to generate makefiles
-
-To use options for install prefix or release build mode, run like this example:
-cmake -D CMAKE_INSTALL_PREFIX=/home/stephen/Documents/ResourcePacker/build/install/ -D CMAKE_BUILD_TYPE=Release ../src
-
-After makefiles are generated, run make to compile.
-
-
-Installing:
-
-run make install to install to ${CMAKE_INSTALL_PREFIX}/bin
-
-by default, CMAKE_INSTALL_PREFIX is probably the root directory.
+(using gradle)
+Run "gradle tasks" to view the 'build targets' for the project.
+You can then run "gradle <task>" to build that target.
 
 
 Format:
