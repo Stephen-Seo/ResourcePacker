@@ -79,12 +79,6 @@ libraries {
                 cppCompiler.args "-m32", "-march=i686", "-mtune=generic"
                 linker.args "-m32"
             }
-            if(targetPlatform.getDisplayName().endsWith("'windows_x86'")) {
-                //cppCompiler.args "-I/usr/i686-w64-mingw32/include"//, "-nostdinc", "-nostdinc++"
-            }
-            if(targetPlatform.getDisplayName().endsWith("'windows_x86_64'")) {
-                //cppCompiler.args "-I/usr/x86_64-w64-mingw32/include"//, "-nostdinc", "-nostdinc++"
-            }
         }
         binaries.withType(SharedLibraryBinarySpec) {
             cppCompiler.define "BUILD_SHARED_LIBS"
