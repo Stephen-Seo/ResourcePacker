@@ -1,4 +1,0 @@
-include 'RP_linux_x86'
-include 'RP_linux_x86_64'
-include 'RP_windows_x86'
-include 'RP_windows_x86_64'
