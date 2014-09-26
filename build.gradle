@@ -80,7 +80,7 @@ model {
 
 libraries {
     ResourcePacker {
-        targetPlatforms "linux_x86", "linux_x86_64", "windows_x86", "windows_x86_64"
+        targetPlatform "linux_x86", "linux_x86_64", "windows_x86", "windows_x86_64"
 
         binaries.all {
             cppCompiler.args "-std=c++11", "-Wall", "-Wextra"
@@ -106,7 +106,7 @@ libraries {
 
 executables {
     RP_main {
-        targetPlatforms "linux_x86", "linux_x86_64", "windows_x86", "windows_x86_64"
+        targetPlatform "linux_x86", "linux_x86_64", "windows_x86", "windows_x86_64"
 
         binaries.all {
             cppCompiler.args "-std=c++11", "-Wall", "-Wextra"
