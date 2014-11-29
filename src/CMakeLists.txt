@@ -82,7 +82,7 @@ export(EXPORT ResourcePackerTargets
 
 configure_file(cmake/ResourcePackerConfig.cmake
   "${CMAKE_CURRENT_BINARY_DIR}/ResourcePacker/ResourcePackerConfig.cmake"
-  COPY_ONLY
+  @ONLY
 )
 
 set(ConfigPackageLocation lib/cmake/ResourcePacker)
@@ -94,7 +94,7 @@ install(EXPORT ResourcePackerTargets
 )
 install(
   FILES
-    cmake/ResourcePackerConfig.cmake
+    "${CMAKE_CURRENT_BINARY_DIR}/ResourcePacker/ResourcePackerConfig.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/ResourcePacker/ResourcePackerConfigVersion.cmake"
   DESTINATION
     ${ConfigPackageLocation}
