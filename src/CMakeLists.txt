@@ -85,6 +85,8 @@ configure_file(cmake/ResourcePackerConfig.cmake
   @ONLY
 )
 
+export(PACKAGE ResourcePacker)
+
 set(ConfigPackageLocation lib/cmake/ResourcePacker)
 install(EXPORT ResourcePackerTargets
   FILE
