@@ -32,20 +32,21 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 endif()
 
-if(NOT DEFINED BUILD_SHARED_LIBS)
-    message(STATUS "Setting BUILD_SHARED_LIBS to 'True', none was specified.")
-    set(BUILD_SHARED_LIBS True CACHE STRING "Choose whether or not to build lib as shared." FORCE)
-    set_property(CACHE BUILD_SHARED_LIBS PROPERTY STRINGS "True" "False")
-endif()
 
-
-add_library(ResourcePacker ResourcePacker.cpp)
+add_library(ResourcePacker SHARED ResourcePacker.cpp)
+add_library(ResourcePacker-s STATIC ResourcePacker.cpp)
 
 generate_export_header(ResourcePacker)
 set_property(TARGET ResourcePacker PROPERTY VERSION ${RP_VERSION})
 set_property(TARGET ResourcePacker PROPERTY SOVERSION 1)
 set_property(TARGET ResourcePacker PROPERTY INTERFACE_ResourcePacker_MAJOR_VERSION 1)
 set_property(TARGET ResourcePacker APPEND PROPERTY COMPATIBLE_INTERFACE_STRING ResourcePacker_MAJOR_VERSION)
+
+generate_export_header(ResourcePacker-s)
+set_property(TARGET ResourcePacker-s PROPERTY VERSION ${RP_VERSION})
+#set_property(TARGET ResourcePacker-s PROPERTY SOVERSION 1)
+set_property(TARGET ResourcePacker-s PROPERTY INTERFACE_ResourcePacker-s_MAJOR_VERSION 1)
+set_property(TARGET ResourcePacker-s APPEND PROPERTY COMPATIBLE_INTERFACE_STRING ResourcePacker-s_MAJOR_VERSION)
 
 
 add_executable(ResourcePackerExecutable main.cpp)
@@ -57,12 +58,19 @@ install(TARGETS ResourcePacker EXPORT ResourcePackerTargets
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include)
 
+install(TARGETS ResourcePacker-s EXPORT ResourcePacker-sTargets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include)
+
 install(TARGETS ResourcePackerExecutable DESTINATION bin)
 
 install(
   FILES
     ResourcePacker.hpp
     "${CMAKE_CURRENT_BINARY_DIR}/resourcepacker_export.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/resourcepacker-s_export.h"
   DESTINATION
     include
   COMPONENT
@@ -76,8 +84,18 @@ write_basic_package_version_file(
   COMPATIBILITY AnyNewerVersion
 )
 
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/ResourcePacker-s/ResourcePacker-sConfigVersion.cmake"
+  VERSION ${RP_VERSION}
+  COMPATIBILITY AnyNewerVersion
+)
+
 export(EXPORT ResourcePackerTargets
   FILE "${CMAKE_CURRENT_BINARY_DIR}/ResourcePacker/ResourcePackerTargets.cmake"
+)
+
+export(EXPORT ResourcePacker-sTargets
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/ResourcePacker-s/ResourcePacker-sTargets.cmake"
 )
 
 configure_file(cmake/ResourcePackerConfig.cmake
@@ -85,21 +103,45 @@ configure_file(cmake/ResourcePackerConfig.cmake
   @ONLY
 )
 
+configure_file(cmake/ResourcePacker-sConfig.cmake
+  "${CMAKE_CURRENT_BINARY_DIR}/ResourcePacker-s/ResourcePacker-sConfig.cmake"
+  @ONLY
+)
+
 export(PACKAGE ResourcePacker)
+export(PACKAGE ResourcePacker-s)
 
 set(ConfigPackageLocation lib/cmake/ResourcePacker)
+set(ConfigPackageLocation-s lib/cmake/ResourcePacker-s)
+
 install(EXPORT ResourcePackerTargets
   FILE
     ResourcePackerTargets.cmake
   DESTINATION
     ${ConfigPackageLocation}
 )
+install(EXPORT ResourcePacker-sTargets
+  FILE
+    ResourcePacker-sTargets.cmake
+  DESTINATION
+    ${ConfigPackageLocation-s}
+)
+
 install(
   FILES
     "${CMAKE_CURRENT_BINARY_DIR}/ResourcePacker/ResourcePackerConfig.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/ResourcePacker/ResourcePackerConfigVersion.cmake"
   DESTINATION
     ${ConfigPackageLocation}
+  COMPONENT
+    Devel
+)
+install(
+  FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/ResourcePacker-s/ResourcePacker-sConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/ResourcePacker-s/ResourcePacker-sConfigVersion.cmake"
+  DESTINATION
+    ${ConfigPackageLocation-s}
   COMPONENT
     Devel
 )
