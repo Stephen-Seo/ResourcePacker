@@ -4,7 +4,7 @@ project(ResourcePacker)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
 
-set(RP_VERSION 1.0.0)
+set(RP_VERSION 1.1.0)
 
 include(GenerateExportHeader)
 

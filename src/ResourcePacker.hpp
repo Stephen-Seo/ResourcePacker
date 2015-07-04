@@ -4,7 +4,7 @@
 
 #define RESOURCE_PACKER_IDENTIFIER "RPACK"
 #define VALID_FILENAME_CHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_0123456789."
-#define RW_BYTE_RATE 512
+#define RW_BYTE_RATE 1024
 
 #if defined(_WIN32)
   #include <windows.h>

@@ -27,7 +27,7 @@ Format:
     Identifier           (5 bytes)
     Number of items      (16 bit / 2 bytes)
     location (per item)  (64 bit / 8 bytes)
-    name (per item)      (127 bytes)
+    name (per item)      (128 bytes)
   Content
     (of variable size based on files packed in the packfile)
 
@@ -35,11 +35,11 @@ Format:
 5 bytes equal to the packfile's identifier
 2 bytes equal to the number 3
 8 bytes equal to location of the first file in this packfile
-127 bytes containing a null-terminated string which is the name of the first
+128 bytes containing a null-terminated string which is the name of the first
     file in this packfile
 8 bytes equal to location of the second file in this packfile
-127 bytes containing a null-terminated string which is the name of the second
+128 bytes containing a null-terminated string which is the name of the second
     file in this packfile
 8 bytes equal to location of the third file in this packfile
-127 bytes containing a null-terminated string which is the name of the third
+128 bytes containing a null-terminated string which is the name of the third
     file in this packfile)

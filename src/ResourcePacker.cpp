@@ -74,7 +74,7 @@ bool RP::checkIfPackfile(const char* name)
         return false;
     }
 
-    char* data = (char*) malloc(sizeof(char) * 127);
+    char* data = (char*) malloc(sizeof(char) * 128);
     unsigned short number;
 
     // check identifier
@@ -117,7 +117,7 @@ bool RP::checkIfPackfile(const char* name)
         }
 
         // name
-        ifstream.read(data, 127);
+        ifstream.read(data, 128);
 
         if(!ifstream.good())
         {
@@ -158,8 +158,8 @@ bool RP::createPackfile(std::list<std::string> files, std::string packfileName)
     // get file sizes
     for(auto iter = files.begin(); iter != files.end(); ++iter)
     {
-        // fail if filename is greater than 126 characters long
-        if(getNameFromPath(*iter).size() > 126)
+        // fail if filename is greater than 127 characters long
+        if(getNameFromPath(*iter).size() > 127)
             return false;
 
         size = 0;
@@ -188,7 +188,7 @@ bool RP::createPackfile(std::list<std::string> files, std::string packfileName)
     }
 
     // calculate header size
-    unsigned int header_size = 5 + 2 + info.items * 8 + info.items * 127;
+    unsigned int header_size = 5 + 2 + info.items * 8 + info.items * 128;
 #ifndef NDEBUG
     std::cout << "HEADER_SIZE = " << header_size << '\n';
 #endif
@@ -230,10 +230,10 @@ bool RP::createPackfile(std::list<std::string> files, std::string packfileName)
 
         ofstream.write(info.names[i].c_str(), temp);
 
-        if(temp != 127)
+        if(temp != 128)
         {
-            char* filler = (char*) calloc(1, sizeof(char) * (127 - temp));
-            ofstream.write(filler, 127 - temp);
+            char* filler = (char*) calloc(1, sizeof(char) * (128 - temp));
+            ofstream.write(filler, 128 - temp);
             free(filler);
         }
     }
@@ -302,7 +302,7 @@ bool RP::readPackfileInfo(std::string packfileName, PackInfo& packInfo)
             if(!nullReached)
                 packInfo.names[i] += data;
             ++x;
-        } while (x < 127);
+        } while (x < 128);
     }
 
     return true;
@@ -317,7 +317,7 @@ bool RP::getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size,
     ifstream.imbue(std::locale::classic());
     ifstream.open(packfile, std::ios::in | std::ios::binary);
 
-    char* data = (char*) malloc(sizeof(char) * 127);
+    char* data = (char*) malloc(sizeof(char) * 128);
 
     ifstream.read(data, 5);
 
@@ -334,7 +334,7 @@ bool RP::getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size,
     {
         ifstream.read((char*) &location, 8);
 
-        ifstream.read(data, 127);
+        ifstream.read(data, 128);
 
         if(std::strcmp(data, filename.c_str()) == 0)
         {
@@ -367,7 +367,7 @@ bool RP::getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size,
         ifstream.seekg(location);
         while(ifstream.good())
         {
-            ifstream.read(data, 127);
+            ifstream.read(data, 128);
             size += ifstream.gcount();
         }
     }
