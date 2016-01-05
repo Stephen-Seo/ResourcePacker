@@ -20,7 +20,7 @@ all:    ResourcePacker.dll ResourcePacker.exe
 ResourcePacker.dll: ${ResourcePacker_SOURCES}
 		$(CXX) $(LINKER_FLAGS) -shared -o ResourcePacker.dll ${LINKER_LIBS} ${ResourcePacker_SOURCES}
 
-ResourcePacker.dll: ${ResourcePacker_SOURCES} ${ResourcePackerBin_SOURCES}
+ResourcePacker.exe: ${ResourcePacker_SOURCES} ${ResourcePackerBin_SOURCES}
 		$(CXX) $(LINKER_FLAGS) -o ResourcePacker.exe ${LINKER_LIBS} ${ResourcePacker_SOURCES} ${ResourcePackerBin_SOURCES}
 
 clean:	../src.clean
