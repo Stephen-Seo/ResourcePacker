@@ -1,7 +1,11 @@
 ResourcePacker_VERSION = 1.2.0
 
 SRC_ROOT = ../src
+ifdef CXX_OVERRIDE
+CXX = ${CXX_OVERRIDE}
+else
 CXX = x86_64-w64-mingw32-g++
+endif
 CXXFLAGS = -c -std=c++11 -Wall -Wextra -O3 -D NDEBUG \
            -I${SRC_ROOT} \
            -mwindows
