@@ -22,6 +22,7 @@ void printHelp()
     std::cout << "    If you don't set the packfile name, you will be prompted"
         " for it.\n";
     std::cout << "Option '-n <name>' sets the packfile name. Use with '-w'.\n";
+    std::cout << "Option '-o' allows overwriting existing packfiles.\n";
     std::cout << "Option '-h' will print this notice.\n";
     std::cout << "Option '--testGet' will retrieve a file from the packfile but"
         " do nothing with it.\n";
@@ -39,6 +40,7 @@ int main(int argc, char** argv)
 {
     Type type = READ_TOC;
     std::string name = "";
+    bool overwrite = false;
 
     // Skip program name invocation string
     --argc;
@@ -71,6 +73,13 @@ int main(int argc, char** argv)
                 return 1;
             }
             name = argv[0];
+            --argc;
+            ++argv;
+            continue;
+        }
+        else if(std::strcmp(argv[0], "-o") == 0)
+        {
+            overwrite = true;
             --argc;
             ++argv;
             continue;
@@ -157,7 +166,7 @@ int main(int argc, char** argv)
             std::cout << "Input filename \"" << outfile << "\" is valid.\n";
 #endif
             std::cout << "Creating packfile with name " << outfile << '\n';
-            if(RP::createPackfile(inputList, outfile))
+            if(RP::createPackfile(inputList, outfile, overwrite))
                 return 0;
             else
                 return -1;

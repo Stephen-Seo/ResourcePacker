@@ -143,10 +143,10 @@ bool RP::checkIfPackfile(const char* name)
     return true;
 }
 
-bool RP::createPackfile(std::list<std::string> files, std::string packfileName)
+bool RP::createPackfile(std::list<std::string> files, std::string packfileName, bool overwrite)
 {
     // fail if file exists with same filename
-    if(checkIfFileExists(packfileName.c_str()))
+    if(checkIfFileExists(packfileName.c_str()) && !overwrite)
         return false;
 
     PackInfo info;

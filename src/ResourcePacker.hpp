@@ -62,7 +62,7 @@ namespace RP
     // checks if 'name' is a packfile (checks header, not contents)
     bool RP_EXPORT checkIfPackfile(const char* name);
     // creates a packfile with filenames in list 'files' and with name 'packfileName'
-    bool RP_EXPORT createPackfile(std::list<std::string> files, std::string packfileName);
+    bool RP_EXPORT createPackfile(std::list<std::string> files, std::string packfileName, bool overwrite = false);
     // gets info from the header of a packfile named 'packfileName'
     bool RP_EXPORT readPackfileInfo(std::string packfileName, PackInfo& packInfo);
     // gets a file's data from a packfile named 'packfile' of name 'filename'
