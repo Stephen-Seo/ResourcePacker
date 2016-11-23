@@ -16,17 +16,29 @@ enum Type
 void printHelp()
 {
     std::cout << "  Usage:\n";
-    std::cout << "Specify the name of the packfile to get info about the file.\n";
+    std::cout << "Specify the name of the packfile to get info about the file."
+        "\n";
     std::cout << "Option '-w' will allow you to create a packfile instead.\n";
-    std::cout << "    You will be prompted to set the packfile name.\n";
+    std::cout << "    If you don't set the packfile name, you will be prompted"
+        " for it.\n";
+    std::cout << "Option '-n <name>' sets the packfile name. Use with '-w'.\n";
     std::cout << "Option '-h' will print this notice.\n";
-    std::cout << "Option '--testGet' will retrieve a file from the packfile but do nothing with it.\n";
+    std::cout << "Option '--testGet' will retrieve a file from the packfile but"
+        " do nothing with it.\n";
     std::cout << "    example: '--testGet packfileName filename'\n";
+    std::cout << "Use names/paths of files as additional parameters to add to"
+        " the packfile when writing.\n";
+    std::cout << "Examples:\n  ./ResourcePackerExecutable -n packfile -w "
+        "logo.png llama.wav\n  ./ResourcePackerExecutable --testGet packfile "
+        "logo.png\n";
+
+    std::cout << std::flush;
 }
 
 int main(int argc, char** argv)
 {
     Type type = READ_TOC;
+    std::string name = "";
 
     // Skip program name invocation string
     --argc;
@@ -46,6 +58,19 @@ int main(int argc, char** argv)
         if(std::strcmp(argv[0],"-w") == 0)
         {
             type = WRITE;
+            --argc;
+            ++argv;
+            continue;
+        }
+        else if(std::strcmp(argv[0], "-n") == 0)
+        {
+            --argc;
+            ++argv;
+            if(argc == 0)
+            {
+                return 1;
+            }
+            name = argv[0];
             --argc;
             ++argv;
             continue;
@@ -116,8 +141,15 @@ int main(int argc, char** argv)
     {
     // Create new pack file with specified files
         std::string outfile = "";
-        std::cout << "Please specify a name for the new packfile.\n";
-        std::cin >> outfile;
+        if(name.empty())
+        {
+            std::cout << "Please specify a name for the new packfile.\n";
+            std::cin >> outfile;
+        }
+        else
+        {
+            outfile = name;
+        }
 
         if(RP::checkIfValidFilename(outfile))
         {
@@ -139,3 +171,4 @@ int main(int argc, char** argv)
 
     return 0;
 }
+
