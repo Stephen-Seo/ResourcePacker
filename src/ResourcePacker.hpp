@@ -61,12 +61,17 @@ namespace RP
     bool RP_EXPORT checkIfValidFilename(std::string name);
     // checks if 'name' is a packfile (checks header, not contents)
     bool RP_EXPORT checkIfPackfile(const char* name);
+    // checks if data is a packfile (checks header, not contents)
+    bool RP_EXPORT checkIfPackfileFromMemory(const char* data, unsigned long long size);
     // creates a packfile with filenames in list 'files' and with name 'packfileName'
     bool RP_EXPORT createPackfile(std::list<std::string> files, std::string packfileName, bool overwrite = false);
     // gets info from the header of a packfile named 'packfileName'
     bool RP_EXPORT readPackfileInfo(std::string packfileName, PackInfo& packInfo);
     // gets a file's data from a packfile named 'packfile' of name 'filename'
     bool RP_EXPORT getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size, std::string packfile, std::string filename);
+    // gets a pointer to a file's data in the packfile data specified by 'filename'
+    bool RP_EXPORT getFileDataFromMemory(char** dataPtr, unsigned long long& size, char* packfileData, unsigned long long packfileSize, const char* filename);
+    bool RP_EXPORT getFileDataFromMemory(char** dataPtr, unsigned long long& size, char* packfileData, unsigned long long packfileSize, std::string filename);
     // returns the filename of a file defined by path 'path'
     std::string RP_EXPORT getNameFromPath(std::string path);
 }

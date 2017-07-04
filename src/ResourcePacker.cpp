@@ -143,6 +143,39 @@ bool RP::checkIfPackfile(const char* name)
     return true;
 }
 
+bool RP::checkIfPackfileFromMemory(const char* data, unsigned long long size)
+{
+    unsigned long long index = 0;
+    // first 5 is identifier
+    if(std::strncmp(data, RESOURCE_PACKER_IDENTIFIER, 5) != 0)
+    {
+        return false;
+    }
+    index += 5;
+
+    // next 2 is number of items
+    unsigned short number = *((unsigned short*)(data + index));
+    index += 2;
+
+    // in header, per item
+    unsigned long long lastLocation;
+    for(unsigned short i = 0; i < number; ++i)
+    {
+        // last location unsigned long long
+        lastLocation = *((unsigned long long*)(data + index));
+        index += 8;
+        // name in 127 bytes
+        index += 127;
+    }
+
+    if(size < lastLocation)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool RP::createPackfile(std::list<std::string> files, std::string packfileName, bool overwrite)
 {
     // fail if file exists with same filename
@@ -389,6 +422,65 @@ bool RP::getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size,
 
     free(data);
     return true;
+}
+
+bool RP::getFileDataFromMemory(char** dataPtr, unsigned long long& size, char* packfileData, unsigned long long packfileSize, const char* filename)
+{
+    if(!checkIfPackfileFromMemory(packfileData, packfileSize))
+    {
+        return false;
+    }
+
+    unsigned long long index = 5;
+
+    unsigned short items = *((unsigned short*)(packfileData + index));
+    index += 2;
+
+    // get file location
+    unsigned long long location;
+    unsigned long long nextLocation;
+    bool found = false;
+    bool nextExists = false;
+    for(unsigned short i = 0; i < items; ++i)
+    {
+        location = *((unsigned long long*)(packfileData + index));
+        index += 8;
+
+        if(std::strcmp(packfileData + index, filename) == 0)
+        {
+            found = true;
+            if(i + 1 < items)
+            {
+                nextLocation = *((unsigned long long*)(packfileData + index + 127));
+                nextExists = true;
+            }
+            break;
+        }
+        index += 127;
+    }
+
+    if(!found)
+    {
+        return false;
+    }
+
+    if(nextExists)
+    {
+        size = nextLocation - location;
+    }
+    else
+    {
+        size = packfileSize - location;
+    }
+
+    *dataPtr = packfileData + location;
+
+    return true;
+}
+
+bool RP::getFileDataFromMemory(char** dataPtr, unsigned long long& size, char* packfileData, unsigned long long packfileSize, std::string filename)
+{
+    getFileDataFromMemory(dataPtr, size, packfileData, packfileSize, filename.c_str());
 }
 
 std::string RP::getNameFromPath(std::string path)
