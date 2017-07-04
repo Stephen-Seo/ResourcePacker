@@ -480,7 +480,7 @@ bool RP::getFileDataFromMemory(char** dataPtr, unsigned long long& size, char* p
 
 bool RP::getFileDataFromMemory(char** dataPtr, unsigned long long& size, char* packfileData, unsigned long long packfileSize, std::string filename)
 {
-    getFileDataFromMemory(dataPtr, size, packfileData, packfileSize, filename.c_str());
+    return getFileDataFromMemory(dataPtr, size, packfileData, packfileSize, filename.c_str());
 }
 
 std::string RP::getNameFromPath(std::string path)
