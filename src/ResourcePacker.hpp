@@ -70,8 +70,8 @@ namespace RP
     // gets a file's data from a packfile named 'packfile' of name 'filename'
     bool RP_EXPORT getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size, std::string packfile, std::string filename);
     // gets a pointer to a file's data in the packfile data specified by 'filename'
-    bool RP_EXPORT getFileDataFromMemory(char** dataPtr, unsigned long long& size, char* packfileData, unsigned long long packfileSize, const char* filename);
-    bool RP_EXPORT getFileDataFromMemory(char** dataPtr, unsigned long long& size, char* packfileData, unsigned long long packfileSize, std::string filename);
+    bool RP_EXPORT getFileDataFromMemory(const char** dataPtr, unsigned long long& size, const char* packfileData, unsigned long long packfileSize, const char* filename);
+    bool RP_EXPORT getFileDataFromMemory(const char** dataPtr, unsigned long long& size, const char* packfileData, unsigned long long packfileSize, std::string filename);
     // returns the filename of a file defined by path 'path'
     std::string RP_EXPORT getNameFromPath(std::string path);
 }

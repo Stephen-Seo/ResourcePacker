@@ -424,7 +424,7 @@ bool RP::getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size,
     return true;
 }
 
-bool RP::getFileDataFromMemory(char** dataPtr, unsigned long long& size, char* packfileData, unsigned long long packfileSize, const char* filename)
+bool RP::getFileDataFromMemory(const char** dataPtr, unsigned long long& size, const char* packfileData, unsigned long long packfileSize, const char* filename)
 {
     if(!checkIfPackfileFromMemory(packfileData, packfileSize))
     {
@@ -478,7 +478,7 @@ bool RP::getFileDataFromMemory(char** dataPtr, unsigned long long& size, char* p
     return true;
 }
 
-bool RP::getFileDataFromMemory(char** dataPtr, unsigned long long& size, char* packfileData, unsigned long long packfileSize, std::string filename)
+bool RP::getFileDataFromMemory(const char** dataPtr, unsigned long long& size, const char* packfileData, unsigned long long packfileSize, std::string filename)
 {
     return getFileDataFromMemory(dataPtr, size, packfileData, packfileSize, filename.c_str());
 }
