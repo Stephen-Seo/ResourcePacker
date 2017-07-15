@@ -483,17 +483,9 @@ bool RP::getFileDataFromMemory(const char** dataPtr, unsigned long long& size, c
     return getFileDataFromMemory(dataPtr, size, packfileData, packfileSize, filename.c_str());
 }
 
-std::string RP::getNameFromPath(std::string path)
+std::string RP::getNameFromPath(std::string path, char delimeter)
 {
-    std::string delimeter;
-#if defined(_WIN32)
-    delimeter = "\\";
-#elif defined(__WIN32__)
-    delimeter = "\\";
-#else
-    delimeter = "/";
-#endif
-    while(path.substr(path.size() - 1, 1) == delimeter)
+    while(path.substr(path.size() - 1, 1).c_str()[0] == delimeter)
     {
         path = path.substr(0, path.size() - 1);
     }

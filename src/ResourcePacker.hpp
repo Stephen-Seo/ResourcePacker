@@ -73,7 +73,15 @@ namespace RP
     bool RP_EXPORT getFileDataFromMemory(const char** dataPtr, unsigned long long& size, const char* packfileData, unsigned long long packfileSize, const char* filename);
     bool RP_EXPORT getFileDataFromMemory(const char** dataPtr, unsigned long long& size, const char* packfileData, unsigned long long packfileSize, std::string filename);
     // returns the filename of a file defined by path 'path'
-    std::string RP_EXPORT getNameFromPath(std::string path);
+    std::string RP_EXPORT getNameFromPath(std::string path, char delimeter =
+#if defined(_WIN32)
+        '\\'
+#elif defined(__WIN32__)
+        '\\'
+#else
+        '/'
+#endif
+    );
 }
 
 #endif
