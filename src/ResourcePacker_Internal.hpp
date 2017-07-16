@@ -43,7 +43,7 @@ namespace RP
 
         i.read((char*) &bint.i, sizeof(T));
 
-        if(!isLittleEndian())
+        if(!isLittleEndian() && sizeof(T) > 1)
         {
             char s;
             for(unsigned int i = 0; i < sizeof(T) / 2; ++i)
