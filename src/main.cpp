@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 
             std::string packfileName(argv[0]), filename(argv[1]);
             std::unique_ptr<char[]> data;
-            unsigned long long size;
+            std::uint64_t size;
 
             if(!RP::getFileData(data, size, packfileName, filename))
             {

@@ -1,5 +1,17 @@
 
 #include "ResourcePacker.hpp"
+#include "ResourcePacker_Internal.hpp"
+
+bool RP::isLittleEndian()
+{
+    union
+    {
+        std::uint32_t i;
+        char c[4];
+    } bint = { 0x01020304 };
+
+    return bint.c[0] == 0x4;
+}
 
 bool RP::checkIfFile(const char* name)
 {
@@ -75,7 +87,7 @@ bool RP::checkIfPackfile(const char* name)
     }
 
     char* data = (char*) malloc(sizeof(char) * 127);
-    unsigned short number;
+    std::uint16_t number;
 
     // check identifier
     ifstream.read(data, 5);
@@ -91,7 +103,7 @@ bool RP::checkIfPackfile(const char* name)
     // check if filesize is greater than header
 
     // get number of items
-    ifstream.read((char*) &number, 2);
+    number = readLittleEndian<std::uint16_t>(ifstream);
 
     if(!ifstream.good())
     {
@@ -101,12 +113,12 @@ bool RP::checkIfPackfile(const char* name)
         return false;
     }
 
-    unsigned long long lastLocation;
+    std::uint64_t lastLocation;
     // seek through rest of header
-    for(unsigned short i = 0; i < number; ++i)
+    for(std::uint16_t i = 0; i < number; ++i)
     {
         // location
-        ifstream.read((char*) &lastLocation, 8);
+        lastLocation = readLittleEndian<std::uint64_t>(ifstream);
 
         if(!ifstream.good())
         {
@@ -143,9 +155,9 @@ bool RP::checkIfPackfile(const char* name)
     return true;
 }
 
-bool RP::checkIfPackfileFromMemory(const char* data, unsigned long long size)
+bool RP::checkIfPackfileFromMemory(const char* data, std::uint64_t size)
 {
-    unsigned long long index = 0;
+    std::uint64_t index = 0;
     // first 5 is identifier
     if(std::strncmp(data, RESOURCE_PACKER_IDENTIFIER, 5) != 0)
     {
@@ -154,15 +166,15 @@ bool RP::checkIfPackfileFromMemory(const char* data, unsigned long long size)
     index += 5;
 
     // next 2 is number of items
-    unsigned short number = *((unsigned short*)(data + index));
+    std::uint16_t number = *((std::uint16_t*)(data + index));
     index += 2;
 
     // in header, per item
-    unsigned long long lastLocation;
-    for(unsigned short i = 0; i < number; ++i)
+    std::uint64_t lastLocation;
+    for(std::uint16_t i = 0; i < number; ++i)
     {
-        // last location unsigned long long
-        lastLocation = *((unsigned long long*)(data + index));
+        // last location std::uint64_t
+        lastLocation = *((std::uint64_t*)(data + index));
         index += 8;
         // name in 127 bytes
         index += 127;
@@ -176,7 +188,12 @@ bool RP::checkIfPackfileFromMemory(const char* data, unsigned long long size)
     return true;
 }
 
-bool RP::createPackfile(std::list<std::string> files, std::string packfileName, bool overwrite)
+bool RP::createPackfile(
+    std::list<std::string> files, 
+    std::string packfileName, 
+    bool overwrite,
+    bool stripPath,
+    char delimeter)
 {
     // fail if file exists with same filename
     if(checkIfFileExists(packfileName.c_str()) && !overwrite)
@@ -186,17 +203,25 @@ bool RP::createPackfile(std::list<std::string> files, std::string packfileName, 
     info.items = files.size();
 
     char* data = (char*) malloc(sizeof(char) * RW_BYTE_RATE);
-    unsigned int size;
+    std::uint32_t size;
 
     // get file sizes
     for(auto iter = files.begin(); iter != files.end(); ++iter)
     {
         // fail if filename is greater than 126 characters long
-        if(getNameFromPath(*iter).size() > 126)
+        if((stripPath && getNameFromPath(*iter, delimeter).size() > 126)
+            || (!stripPath && iter->size() > 126))
             return false;
 
         size = 0;
-        info.names.push_back(getNameFromPath(*iter));
+        if(stripPath)
+        {
+            info.names.push_back(getNameFromPath(*iter, delimeter));
+        }
+        else
+        {
+            info.names.push_back(*iter);
+        }
 
         std::ifstream ifstream;
         ifstream.imbue(std::locale::classic());
@@ -221,14 +246,14 @@ bool RP::createPackfile(std::list<std::string> files, std::string packfileName, 
     }
 
     // calculate header size
-    unsigned int header_size = 5 + 2 + info.items * 8 + info.items * 127;
+    std::uint32_t header_size = 5 + 2 + info.items * 8 + info.items * 127;
 #ifndef NDEBUG
     std::cout << "HEADER_SIZE = " << header_size << '\n';
 #endif
 
     // calculate/set locations
-    unsigned long long temp = 0;
-    unsigned long long location = header_size;
+    std::uint64_t temp = 0;
+    std::uint64_t location = header_size;
     for(int i = 0; i < info.items; ++i)
     {
         location += temp;
@@ -249,13 +274,13 @@ bool RP::createPackfile(std::list<std::string> files, std::string packfileName, 
     ofstream.write(data, 5);
 
     // write number of items
-    ofstream.write((char*) &info.items, 2);
+    writeLittleEndian(ofstream, info.items);
 
     // write items table of contents
     for(int i = 0; i < info.items; ++i)
     {
         // write location of item
-        ofstream.write((char*) &info.locations[i], 8);
+        writeLittleEndian(ofstream, info.locations[i]);
 
         // write name of item
         // offset by 1 due to null-terminated c string
@@ -310,7 +335,7 @@ bool RP::readPackfileInfo(std::string packfileName, PackInfo& packInfo)
     free(tempData);
 
     // get number of items
-    ifstream.read((char*) &packInfo.items, 2);
+    packInfo.items = readLittleEndian<std::uint16_t>(ifstream);
 
     packInfo.locations.assign(packInfo.items, 0);
     packInfo.names.assign(packInfo.items, "");
@@ -319,10 +344,10 @@ bool RP::readPackfileInfo(std::string packfileName, PackInfo& packInfo)
     int x;
     bool nullReached;
 
-    for(unsigned short i = 0; i < packInfo.items; ++i)
+    for(std::uint16_t i = 0; i < packInfo.items; ++i)
     {
         // read location
-        ifstream.read((char*) &packInfo.locations[i], 8);
+        packInfo.locations[i] = readLittleEndian<std::uint64_t>(ifstream);
 
         // read name
         x = 0;
@@ -341,7 +366,7 @@ bool RP::readPackfileInfo(std::string packfileName, PackInfo& packInfo)
     return true;
 }
 
-bool RP::getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size, std::string packfile, std::string filename)
+bool RP::getFileData(std::unique_ptr<char[]>& dataPtr, std::uint64_t& size, std::string packfile, std::string filename)
 {
     if(!checkIfPackfile(packfile.c_str()))
         return false;
@@ -354,18 +379,18 @@ bool RP::getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size,
 
     ifstream.read(data, 5);
 
-    unsigned short items;
-    unsigned long long location;
-    unsigned long long nextLocation;
+    std::uint16_t items;
+    std::uint64_t location;
+    std::uint64_t nextLocation;
     bool found = false;
     bool nextExists = false;
 
-    ifstream.read((char*) &items, 2);
+    items = readLittleEndian<std::uint16_t>(ifstream);
 
     // get file location from header
-    for(unsigned short i = 0; i < items; ++i)
+    for(std::uint16_t i = 0; i < items; ++i)
     {
-        ifstream.read((char*) &location, 8);
+        location = readLittleEndian<std::uint64_t>(ifstream);
 
         ifstream.read(data, 127);
 
@@ -374,7 +399,7 @@ bool RP::getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size,
             found = true;
             if(i + 1 < items)
             {
-                ifstream.read((char*) &nextLocation, 8);
+                nextLocation = readLittleEndian<std::uint64_t>(ifstream);
                 nextExists = true;
             }
             break;
@@ -424,26 +449,26 @@ bool RP::getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size,
     return true;
 }
 
-bool RP::getFileDataFromMemory(const char** dataPtr, unsigned long long& size, const char* packfileData, unsigned long long packfileSize, const char* filename)
+bool RP::getFileDataFromMemory(const char** dataPtr, std::uint64_t& size, const char* packfileData, std::uint64_t packfileSize, const char* filename)
 {
     if(!checkIfPackfileFromMemory(packfileData, packfileSize))
     {
         return false;
     }
 
-    unsigned long long index = 5;
+    std::uint64_t index = 5;
 
-    unsigned short items = *((unsigned short*)(packfileData + index));
+    std::uint16_t items = *((std::uint16_t*)(packfileData + index));
     index += 2;
 
     // get file location
-    unsigned long long location;
-    unsigned long long nextLocation;
+    std::uint64_t location;
+    std::uint64_t nextLocation;
     bool found = false;
     bool nextExists = false;
-    for(unsigned short i = 0; i < items; ++i)
+    for(std::uint16_t i = 0; i < items; ++i)
     {
-        location = *((unsigned long long*)(packfileData + index));
+        location = *((std::uint64_t*)(packfileData + index));
         index += 8;
 
         if(std::strcmp(packfileData + index, filename) == 0)
@@ -451,7 +476,7 @@ bool RP::getFileDataFromMemory(const char** dataPtr, unsigned long long& size, c
             found = true;
             if(i + 1 < items)
             {
-                nextLocation = *((unsigned long long*)(packfileData + index + 127));
+                nextLocation = *((std::uint64_t*)(packfileData + index + 127));
                 nextExists = true;
             }
             break;
@@ -478,7 +503,7 @@ bool RP::getFileDataFromMemory(const char** dataPtr, unsigned long long& size, c
     return true;
 }
 
-bool RP::getFileDataFromMemory(const char** dataPtr, unsigned long long& size, const char* packfileData, unsigned long long packfileSize, std::string filename)
+bool RP::getFileDataFromMemory(const char** dataPtr, std::uint64_t& size, const char* packfileData, std::uint64_t packfileSize, std::string filename)
 {
     return getFileDataFromMemory(dataPtr, size, packfileData, packfileSize, filename.c_str());
 }

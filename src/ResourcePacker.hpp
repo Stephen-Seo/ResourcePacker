@@ -39,6 +39,7 @@
 #include <list>
 #include <memory>
 #include <fstream>
+#include <cstdint>
 
 #ifndef NDEBUG
 #include <iostream>
@@ -48,9 +49,9 @@ namespace RP
 {
     struct RP_EXPORT PackInfo
     {
-        unsigned short items;
+        std::uint16_t items;
         std::vector<std::string> names;
-        std::vector<unsigned long long> locations;
+        std::vector<std::uint64_t> locations;
     };
 
     // checks if 'name' is an existing file and not a directory
@@ -62,16 +63,29 @@ namespace RP
     // checks if 'name' is a packfile (checks header, not contents)
     bool RP_EXPORT checkIfPackfile(const char* name);
     // checks if data is a packfile (checks header, not contents)
-    bool RP_EXPORT checkIfPackfileFromMemory(const char* data, unsigned long long size);
+    bool RP_EXPORT checkIfPackfileFromMemory(const char* data, std::uint64_t size);
     // creates a packfile with filenames in list 'files' and with name 'packfileName'
-    bool RP_EXPORT createPackfile(std::list<std::string> files, std::string packfileName, bool overwrite = false);
+    bool RP_EXPORT createPackfile(
+        std::list<std::string> files,
+        std::string packfileName,
+        bool overwrite = false,
+        bool stripPath = true,
+        char delimeter =
+#if defined(_WIN32)
+        '\\'
+#elif defined(__WIN32__)
+        '\\'
+#else
+        '/'
+#endif   
+    );
     // gets info from the header of a packfile named 'packfileName'
     bool RP_EXPORT readPackfileInfo(std::string packfileName, PackInfo& packInfo);
     // gets a file's data from a packfile named 'packfile' of name 'filename'
-    bool RP_EXPORT getFileData(std::unique_ptr<char[]>& dataPtr, unsigned long long& size, std::string packfile, std::string filename);
+    bool RP_EXPORT getFileData(std::unique_ptr<char[]>& dataPtr, std::uint64_t& size, std::string packfile, std::string filename);
     // gets a pointer to a file's data in the packfile data specified by 'filename'
-    bool RP_EXPORT getFileDataFromMemory(const char** dataPtr, unsigned long long& size, const char* packfileData, unsigned long long packfileSize, const char* filename);
-    bool RP_EXPORT getFileDataFromMemory(const char** dataPtr, unsigned long long& size, const char* packfileData, unsigned long long packfileSize, std::string filename);
+    bool RP_EXPORT getFileDataFromMemory(const char** dataPtr, std::uint64_t& size, const char* packfileData, std::uint64_t packfileSize, const char* filename);
+    bool RP_EXPORT getFileDataFromMemory(const char** dataPtr, std::uint64_t& size, const char* packfileData, std::uint64_t packfileSize, std::string filename);
     // returns the filename of a file defined by path 'path'
     std::string RP_EXPORT getNameFromPath(std::string path, char delimeter =
 #if defined(_WIN32)
