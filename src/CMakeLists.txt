@@ -9,7 +9,7 @@ set(RP_VERSION 1.2.0)
 include(GenerateExportHeader)
 
 if(NOT MSVC)
-    set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra")
+    set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -Wpedantic")
     set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -D NDEBUG")
 endif()

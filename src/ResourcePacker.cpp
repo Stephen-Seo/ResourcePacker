@@ -113,7 +113,7 @@ bool RP::checkIfPackfile(const char* name)
         return false;
     }
 
-    std::uint64_t lastLocation;
+    std::uint64_t lastLocation = 0;
     // seek through rest of header
     for(std::uint16_t i = 0; i < number; ++i)
     {
@@ -138,6 +138,17 @@ bool RP::checkIfPackfile(const char* name)
             free(data);
             return false;
         }
+    }
+
+    // Check if no items in packfile, invalid if true
+    if(lastLocation == 0)
+    {
+        if(ifstream.is_open())
+        {
+            ifstream.close();
+        }
+        free(data);
+        return false;
     }
 
     // check if filesize is greater than last location
