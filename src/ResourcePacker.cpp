@@ -91,9 +91,8 @@ bool RP::checkIfPackfile(const char* name)
 
     // check identifier
     ifstream.read(data, 5);
-    data[5] = '\0';
 
-    if(std::strcmp(data, RESOURCE_PACKER_IDENTIFIER) != 0 || !ifstream.good())
+    if(std::memcmp(data, RESOURCE_PACKER_IDENTIFIER, 5) != 0 || !ifstream.good())
     {
         ifstream.close();
         free(data);
@@ -170,7 +169,7 @@ bool RP::checkIfPackfileFromMemory(const char* data, std::uint64_t size)
 {
     std::uint64_t index = 0;
     // first 5 is identifier
-    if(std::strncmp(data, RESOURCE_PACKER_IDENTIFIER, 5) != 0)
+    if(std::memcmp(data, RESOURCE_PACKER_IDENTIFIER, 5) != 0)
     {
         return false;
     }
@@ -281,7 +280,7 @@ bool RP::createPackfile(
     ofstream.open(packfileName, std::ios_base::out | std::ios_base::binary);
 
     // write identifier
-    std::strncpy(data, RESOURCE_PACKER_IDENTIFIER, 5);
+    std::memcpy(data, RESOURCE_PACKER_IDENTIFIER, 5);
     ofstream.write(data, 5);
 
     // write number of items
